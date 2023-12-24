@@ -2,7 +2,7 @@ package Pro.sky.EmployeeHandbook;
 
 import java.util.Objects;
 
-class Employee {
+ class Employee {
     private String firstName;
     private String lastName;
 
@@ -40,4 +40,13 @@ class Employee {
                 ", lastName='" + lastName + '\'' +
                 '}';
     }
+}
+
+class EmployeeNotFoundException extends RuntimeException {
+}
+
+class EmployeeStorageIsFullException extends RuntimeException {
+}
+
+class EmployeeAlreadyAddedException extends RuntimeException {
 }

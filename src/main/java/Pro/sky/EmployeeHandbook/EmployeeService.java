@@ -4,55 +4,50 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
-class EmployeeService {
+public class EmployeeService {
     private static final int MAX_EMPLOYEES = 10;
-    private List<Employee> employees = new ArrayList<>();
+    private Map<String, Employee> employeeMap = new HashMap<>();
 
     public void addEmployee(String firstName, String lastName) {
-        if (employees.size() >= MAX_EMPLOYEES) {
+        if (employeeMap.size() >= MAX_EMPLOYEES) {
             throw new EmployeeStorageIsFullException();
         }
 
-        Employee newEmployee = new Employee(firstName, lastName);
-        if (employees.contains(newEmployee)) {
+        String key = generateKey(firstName, lastName);
+        if (employeeMap.containsKey(key)) {
             throw new EmployeeAlreadyAddedException();
         }
 
-        employees.add(newEmployee);
+        Employee newEmployee = new Employee(firstName, lastName);
+        employeeMap.put(key, newEmployee);
     }
 
     public void removeEmployee(String firstName, String lastName) {
-        Employee employeeToRemove = new Employee(firstName, lastName);
-        if (!employees.remove(employeeToRemove)) {
+        String key = generateKey(firstName, lastName);
+        if (employeeMap.remove(key) == null) {
             throw new EmployeeNotFoundException();
         }
     }
 
     public Employee findEmployee(String firstName, String lastName) {
-        Employee employeeToFind = new Employee(firstName, lastName);
-        int index = employees.indexOf(employeeToFind);
-        if (index == -1) {
+        String key = generateKey(firstName, lastName);
+        Employee employee = employeeMap.get(key);
+        if (employee == null) {
             throw new EmployeeNotFoundException();
         }
-        return employees.get(index);
+        return employee;
     }
 
-    public List<Employee> getAllEmployees() {
-        return new ArrayList<>(employees);
+    public Map<String, Employee> getAllEmployees() {
+        return new HashMap<>(employeeMap);
     }
-}
 
-@ResponseStatus
-class EmployeeNotFoundException extends RuntimeException {
-}
-
-@ResponseStatus
-class EmployeeStorageIsFullException extends RuntimeException {
-}
-
-@ResponseStatus
-class EmployeeAlreadyAddedException extends RuntimeException {
+    private String generateKey(String firstName, String lastName) {
+        return firstName + "_" + lastName;
+    }
 }
